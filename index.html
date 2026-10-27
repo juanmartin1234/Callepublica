@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calle Pública: objetos de espacio público</title>
+<meta name="description" content="Collage de fotografías de objetos de espacio público, filtrado por objeto, habilidad e inversión.">
+<meta name="theme-color" content="#2b2f33">
+<meta property="og:title" content="Calle Pública">
+<meta property="og:description" content="Collage de fotografías de objetos de espacio público.">
+<meta property="og:type" content="website">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Literata:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --asfalto:#2b2f33; --papel:#f7f8f6; --pasto:#3f7d4e;
+  --pintura:#f2c230; --texto:#1d2124;
+  --titulo:'Bricolage Grotesque',system-ui,sans-serif;
+  --cuerpo:'Literata',Georgia,serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papel);color:var(--texto);font:400 1rem/1.6 var(--cuerpo)}
+.ancho{max-width:64rem;margin:0 auto;padding:0 1.5rem}
+header{padding-top:2.5rem;padding-bottom:1rem}
+h1{font:800 clamp(2rem,6vw,3.6rem)/1 var(--titulo);margin:0 0 .75rem;letter-spacing:-.02em}
+header p{margin:0;max-width:44rem}
+.filtros{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem}
+label{font:500 .9rem var(--titulo);display:flex;flex-direction:column;gap:.2rem}
+select{font:inherit;padding:.45rem .6rem;border:2px solid var(--asfalto);background:#fff;border-radius:6px;min-width:11rem}
+:focus-visible{outline:3px solid var(--pintura);outline-offset:2px}
+
+/* La calle: barra de inversión */
+.control{display:flex;align-items:center;gap:1rem;margin-top:1.5rem;font:500 .9rem var(--titulo)}
+.control > span{width:5.5rem;line-height:1.2}
+.control > span:last-child{text-align:right}
+.via{position:relative;flex:1;height:3rem;background:var(--asfalto);border-radius:6px}
+.via::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:3px dashed var(--pintura)}
+.punto{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:#8b9096;transform:translate(-50%,-50%)}
+.punto.activo{width:15px;height:15px;background:#fff;box-shadow:0 0 0 2px var(--pintura)}
+#barra{position:absolute;inset:0;width:100%;height:100%;margin:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
+#barra::-webkit-slider-runnable-track{height:100%;background:transparent}
+#barra::-moz-range-track{height:100%;background:transparent}
+#barra::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:44px;margin-top:2px;border-radius:8px;background:var(--pintura);border:3px solid #fff;box-shadow:0 0 0 2px var(--asfalto)}
+#barra::-moz-range-thumb{width:22px;height:38px;border-radius:8px;background:var(--pintura);border:3px solid #fff}
+#estado{margin:.6rem 0 0;font:500 .95rem var(--titulo);min-height:1.6em}
+#aviso{margin:.25rem 0 0;font-size:.9rem;color:#8a3b25}
+
+/* Collage */
+.collage{columns:4 13rem;column-gap:.6rem;margin-top:1rem;margin-bottom:2rem}
+.pieza{display:block;position:relative;width:100%;margin:0 0 .6rem;padding:0;break-inside:avoid;
+  border:2px solid var(--asfalto);border-radius:8px;overflow:hidden;cursor:pointer;background:#fff;text-align:left;font:inherit;color:inherit}
+.pieza:focus-visible{outline:3px solid var(--pintura);outline-offset:3px}
+.pieza img{display:block;width:100%;height:auto}
+.ph{display:flex;align-items:flex-end;padding:.6rem;color:#fff;font:800 1.1rem var(--titulo)}
+.leyenda{position:absolute;left:0;right:0;bottom:0;padding:1.5rem .6rem .5rem;
+  background:linear-gradient(transparent,rgba(29,33,36,.85));color:#fff;font:500 .85rem/1.25 var(--titulo)}
+.leyenda b{display:block;font-weight:800;font-size:.95rem}
+.leyenda i{font-style:normal;color:var(--pintura)}
+
+footer{padding-bottom:3rem;font-size:.85rem;color:#4a5055}
+
+/* Ficha */
+dialog{border:3px solid var(--asfalto);border-radius:10px;padding:0;max-width:36rem;width:calc(100% - 2rem)}
+dialog::backdrop{background:rgba(29,33,36,.6)}
+.ficha .foto{height:min(24rem,55vh);background:var(--pasto) center/cover;color:#fff;display:flex;align-items:flex-end;padding:.6rem;font:800 1.2rem var(--titulo)}
+.ficha .cuerpo{padding:1rem 1.25rem 1.25rem}
+.ficha h2{font:800 1.6rem/1.1 var(--titulo);margin:0 0 .25rem}
+.ficha dl{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;margin:1rem 0;font-size:.9rem}
+.ficha dt{font-family:var(--titulo);font-weight:500}
+.ficha dd{margin:0}
+.galeria{display:flex;gap:.4rem;margin-top:.6rem}
+.galeria button{all:unset;cursor:pointer;width:5.5rem;height:4.5rem;border-radius:4px;border:2px solid var(--asfalto);background:center/cover}
+.galeria button:focus-visible{outline:3px solid var(--pintura)}
+button.cerrar{font:500 1rem var(--titulo);background:var(--asfalto);color:#fff;border:0;border-radius:6px;padding:.5rem 1rem;cursor:pointer;margin-top:1rem}
+</style>
+</head>
+<body>
+
+<header class="ancho">
+  <h1>Calle Pública</h1>
+  <p>Un collage de fotografías de objetos de espacio público. Elige un objeto o una habilidad y mueve la barra de inversión: el collage se arma con las fotos más cercanas al valor que marques.</p>
+  <div class="filtros">
+    <label>Tipo de objeto
+      <select id="fObjeto"><option value="">Todos</option></select>
+    </label>
+    <label>Habilidad
+      <select id="fHabilidad"><option value="">Todas</option></select>
+    </label>
+  </div>
+</header>
+
+<section class="ancho" aria-label="Barra de inversión">
+  <div class="control">
+    <span id="ejeMin"></span>
+    <div class="via" id="via">
+      <input type="range" id="barra" min="0" max="1000" value="0" step="1" aria-label="Elegir valor de inversión">
+    </div>
+    <span id="ejeMax"></span>
+  </div>
+  <p id="estado" aria-live="polite"></p>
+  <p id="aviso" hidden></p>
+</section>
+
+<main class="ancho">
+  <div class="collage" id="collage"></div>
+</main>
+
+<footer class="ancho">Los datos de ejemplo son ficticios. Reemplázalos por tus proyectos.</footer>
+
+<dialog id="ficha"><div class="ficha" id="fichaContenido"></div></dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+/* ============ 1. CONFIGURACIÓN (edita aquí) ============ */
+const CONFIG = {
+  // Pega aquí el link CSV de tu Google Sheet publicado. Si lo dejas vacío, usa los datos de ejemplo.
+  CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSmALcb8O27ikI-2QHOBwAmfhbJ2E0Sef_WrgZk1YqlvPTI2EaT8FN9M7UEogJ9yytw01q_xKvc8-mP/pub?gid=2100160667&single=true&output=csv",
+  EJE_NOMBRE: "Inversión (USD)",
+  EJE_MIN: "Menos inversión",
+  EJE_MAX: "Más inversión",
+  UNIDAD: "USD",
+  // Cuántas fotos aparecen en el collage (las más cercanas al valor de la barra).
+  FOTOS_VISIBLES: 10
+};
+
+/* ============ 2. DATOS DE EJEMPLO (ficticios) ============ */
+// Columnas del Sheet: nombre, lugar, objeto, habilidad, valor_eje, anio, descripcion, foto1, foto2, foto3, autor_foto
+const EJEMPLO = [
+  ["Banca de pallets","Banca","Carpintería",12],["Mesa de ajedrez","Mesa","Albañilería",40],
+  ["Jardinera comunitaria","Jardinera","Jardinería",25],["Juego de llantas","Juego infantil","Pintura",8],
+  ["Luminaria solar","Luminaria","Electricidad",150],["Mural de la esquina","Mural","Pintura",60],
+  ["Bebedero de acero","Bebedero","Soldadura",300],["Pérgola de bambú","Pérgola","Carpintería",520],
+  ["Banca de concreto","Banca","Albañilería",75],["Banca curva de madera","Banca","Carpintería",95],
+  ["Mesa de picnic","Mesa","Carpintería",55],["Huerto vertical","Jardinera","Jardinería",18],
+  ["Columpios de acero","Juego infantil","Soldadura",260],["Poste de luz LED","Luminaria","Electricidad",210],
+  ["Mural de la cancha","Mural","Pintura",35],["Fuente de agua","Bebedero","Albañilería",180],
+  ["Pérgola metálica","Pérgola","Soldadura",430],["Jardinera de neumáticos","Jardinera","Pintura",6],
+  ["Mesa de dominó","Mesa","Albañilería",30],["Banca con respaldo","Banca","Soldadura",120]
+].map(([nombre,objeto,habilidad,valor_eje],i)=>({
+  nombre,objeto,habilidad,valor_eje,lugar:"Barrio de ejemplo",anio:2018+(i%7),
+  descripcion:"Descripción de ejemplo de "+nombre.toLowerCase()+".",autor_foto:"Ejemplo"
+}));
+
+/* ============ 3. LÓGICA ============ */
+const PALETA = ["#3f7d4e","#b5533c","#4a6a8a","#7a5c8a","#9a7b2f","#2f7a7a"];
+const ALTURAS = ["10rem","13rem","16rem","11.5rem","14.5rem"];
+const $ = id => document.getElementById(id);
+let proyectos = [], pendiente = false;
+
+function hash(t){ let n=0; for(const c of t||"") n+=c.charCodeAt(0); return n; }
+const num = n => (Math.round(n*100)/100).toLocaleString("es");
+
+function limpiar(r){
+  return {
+    nombre:(r.nombre||"").trim(), lugar:(r.lugar||"").trim(),
+    objeto:(r.objeto||"").trim(), habilidad:(r.habilidad||"").trim(),
+    valor_eje:parseFloat(r.valor_eje), anio:r.anio||"", descripcion:r.descripcion||"",
+    fotos:[r.foto1,r.foto2,r.foto3].filter(Boolean), autor_foto:r.autor_foto||""
+  };
+}
+
+function cargar(){
+  if(!CONFIG.CSV_URL) return Promise.resolve(EJEMPLO.map(limpiar));
+  return new Promise((ok,fallo)=>{
+    Papa.parse(CONFIG.CSV_URL,{download:true,header:true,skipEmptyLines:true,
+      complete:r=>ok(r.data.map(limpiar).filter(p=>p.nombre&&!isNaN(p.valor_eje))),
+      error:fallo});
+  });
+}
+
+function llenarFiltros(){
+  const unicos = campo => [...new Set(proyectos.map(p=>p[campo]).filter(Boolean))].sort();
+  unicos("objeto").forEach(v=>$("fObjeto").add(new Option(v,v)));
+  unicos("habilidad").forEach(v=>$("fHabilidad").add(new Option(v,v)));
+  $("fObjeto").onchange = $("fHabilidad").onchange = programar;
+}
+
+/* Fotos que cumplen los filtros de objeto y habilidad, ordenadas por inversión.
+   Si ninguna cumple, se usan todas para que siempre haya un collage. */
+function base(){
+  const o=$("fObjeto").value, h=$("fHabilidad").value;
+  const lista = proyectos.filter(p=>(!o||p.objeto===o)&&(!h||p.habilidad===h));
+  const porValor = (a,b)=>a.valor_eje-b.valor_eje;
+  if(lista.length) return {lista:lista.sort(porValor), relajado:false};
+  return {lista:[...proyectos].sort(porValor), relajado:true};
+}
+
+function miniatura(p){
+  const b = document.createElement("button"); b.className="pieza"; b.type="button";
+  b.setAttribute("aria-label", p.nombre+", "+num(p.valor_eje)+" "+CONFIG.UNIDAD);
+  const ph = () => {
+    const d=document.createElement("div"); d.className="ph";
+    d.style.background = PALETA[hash(p.objeto)%PALETA.length];
+    d.style.height = ALTURAS[hash(p.nombre)%ALTURAS.length];
+    d.textContent = p.objeto; return d;
+  };
+  if(p.fotos[0]){
+    const img=document.createElement("img"); img.src=p.fotos[0]; img.alt=p.nombre; img.loading="lazy";
+    img.onerror=()=>img.replaceWith(ph());
+    b.append(img);
+  } else b.append(ph());
+  const l=document.createElement("div"); l.className="leyenda";
+  const n=document.createElement("b"); n.textContent=p.nombre;
+  const v=document.createElement("i"); v.textContent=num(p.valor_eje)+" "+CONFIG.UNIDAD;
+  l.append(n,v); b.append(l);
+  b.onclick=()=>abrir(p);
+  return b;
+}
+
+function programar(){ if(pendiente) return; pendiente=true; requestAnimationFrame(()=>{pendiente=false; dibujar();}); }
+
+function dibujar(){
+  const {lista,relajado} = base();
+  const min = lista[0].valor_eje, max = lista[lista.length-1].valor_eje;
+  const frac = $("barra").value/1000;
+  const objetivo = min + (max-min)*frac;
+
+  // Las N fotos más cercanas al valor de la barra: nunca queda vacío
+  const elegidas = [...lista]
+    .sort((a,b)=>Math.abs(a.valor_eje-objetivo)-Math.abs(b.valor_eje-objetivo))
+    .slice(0,CONFIG.FOTOS_VISIBLES)
+    .sort((a,b)=>a.valor_eje-b.valor_eje);
+  const set = new Set(elegidas);
+
+  $("ejeMin").textContent = CONFIG.EJE_MIN;
+  $("ejeMax").textContent = CONFIG.EJE_MAX;
+  $("barra").disabled = max===min;
+
+  // Puntos sobre la calle: uno por foto
+  const via=$("via");
+  via.querySelectorAll(".punto").forEach(e=>e.remove());
+  lista.forEach(p=>{
+    const f = max>min ? (p.valor_eje-min)/(max-min) : .5;
+    const d=document.createElement("span");
+    d.className="punto"+(set.has(p)?" activo":"");
+    d.style.left=`calc(14px + (100% - 28px) * ${f})`;
+    via.insertBefore(d,$("barra"));
+  });
+
+  // Collage
+  const c=$("collage"); c.replaceChildren(...elegidas.map(miniatura));
+
+  $("estado").textContent = "Inversión elegida: " + num(objetivo) + " " + CONFIG.UNIDAD +
+    ". Mostrando " + elegidas.length + " fotos, de " + num(elegidas[0].valor_eje) +
+    " a " + num(elegidas[elegidas.length-1].valor_eje) + " " + CONFIG.UNIDAD + ".";
+  const av=$("aviso"); av.hidden=!relajado;
+  av.textContent = relajado ? "Ninguna foto cumple los dos filtros a la vez, por eso se muestran fotos de todos los objetos y habilidades." : "";
+}
+
+$("barra").addEventListener("input",programar);
+
+/* Ficha */
+function bloqueFoto(p,i){
+  const d=document.createElement("div"); d.className="foto";
+  const u=p.fotos[i||0];
+  if(u){ d.style.backgroundImage=`url("${u.replace(/"/g,"%22")}")`; d.setAttribute("role","img"); d.setAttribute("aria-label",p.nombre); }
+  else { d.style.background=PALETA[hash(p.objeto)%PALETA.length]; d.textContent=p.objeto; }
+  return d;
+}
+
+function abrir(p){
+  const c=$("fichaContenido"); c.replaceChildren();
+  let principal=bloqueFoto(p,0); c.append(principal);
+  const cuerpo=document.createElement("div"); cuerpo.className="cuerpo";
+  const h=document.createElement("h2"); h.textContent=p.nombre;
+  const d=document.createElement("p"); d.textContent=p.descripcion;
+  const dl=document.createElement("dl");
+  [["Objeto",p.objeto],["Habilidad",p.habilidad],["Lugar",p.lugar],["Año",p.anio],
+   [CONFIG.EJE_NOMBRE,num(p.valor_eje)+" "+CONFIG.UNIDAD],["Foto",p.autor_foto]]
+   .forEach(([k,v])=>{ if(!v) return;
+     const dt=document.createElement("dt"); dt.textContent=k;
+     const dd=document.createElement("dd"); dd.textContent=v; dl.append(dt,dd); });
+  cuerpo.append(h,d,dl);
+  if(p.fotos.length>1){
+    const g=document.createElement("div"); g.className="galeria";
+    p.fotos.forEach((u,i)=>{
+      const t=document.createElement("button");
+      t.style.backgroundImage=`url("${u.replace(/"/g,"%22")}")`;
+      t.setAttribute("aria-label","Ver foto "+(i+1)+" de "+p.nombre);
+      t.onclick=()=>{ const n=bloqueFoto(p,i); principal.replaceWith(n); principal=n; };
+      g.append(t);
+    });
+    cuerpo.append(g);
+  }
+  const x=document.createElement("button"); x.className="cerrar"; x.textContent="Cerrar";
+  x.onclick=()=>$("ficha").close();
+  cuerpo.append(x); c.append(cuerpo);
+  $("ficha").showModal();
+}
+$("ficha").addEventListener("click",e=>{ if(e.target===$("ficha")) $("ficha").close(); });
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+cargar().then(d=>{ proyectos=d; llenarFiltros(); dibujar(); })
+        .catch(()=>{ $("estado").textContent="No se pudo leer la hoja de datos. Revisa que el link CSV esté publicado."; });
+</script>
+</body>
+</html>
